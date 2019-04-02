@@ -18,10 +18,10 @@ objects:     # 资源配置部分
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: openshift/template-example:latest
+        openshift.io/imported-from: openshift/deployment-example:latest
       from:
         kind: DockerImage
-        name: openshift/template-example:latest
+        name: openshift/deployment-example:latest
       generation: null
       importPolicy: {}
       name: latest
@@ -55,7 +55,7 @@ objects:     # 资源配置部分
           templateconfig: template-example
       spec:
         containers:
-        - image: openshift/template-example:latest
+        - image: openshift/deployment-example:latest
           name: template-example
           ports:
           - containerPort: 8080
@@ -70,7 +70,7 @@ objects:     # 资源配置部分
         - template-example
         from:
           kind: ImageStreamTag
-          name: template-example:latest
+          name: deployment-example:latest
       type: ImageChange
   status:
     availableReplicas: 0
