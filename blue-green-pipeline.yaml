@@ -1,8 +1,8 @@
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  template: bluegreen-pipeline
-message: A Jenkins server must be instantiated in this project to manage
+  template: jenkins-cicd-pipeline
+message: A Jenkins server will be automatically instantiated in this project to manage
   the Pipeline BuildConfig created by this template.  You will be able to log in to
   it using your OpenShift user credentials.
 metadata:
@@ -11,7 +11,7 @@ metadata:
       pipeline that pauses for approval.
     iconClass: icon-jenkins
     tags: instant-app,jenkins
-  name: bluegreen-pipeline
+  name: jenkins-cicd-pipeline
 objects:
 - apiVersion: v1
   kind: BuildConfig
@@ -20,8 +20,8 @@ objects:
       pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
     creationTimestamp: null
     labels:
-      name: bluegreen-pipeline
-    name: bluegreen-pipeline
+      name: jenkins-cicd-pipeline
+    name: jenkins-cicd-pipeline
   spec:
     strategy:
       jenkinsPipelineStrategy:
@@ -47,32 +47,22 @@ objects:
                     routeHost = readFile('routehost').trim()
                   }
         
-                  openshift.withCluster() {
-                    openshift.withProject() {
-                      stage("Build") {
-                        echo "building tag ${tag}"
-                        def bld = openshift.startBuild("${appName}")
-                        bld.untilEach {
-                          return it.object().status.phase == "Running"
-                        }
-                        bld.logs('-f')                        
-                      }
-            
-                      stage("Deploy Test") {
-                        openshift.tag("${appName}:latest", "${appName}:${tag}")
-                        def dc = openshift.selector('dc', "${appName}-${tag}")
-                        dc.rollout().status()
-                      }
-            
-                      stage("Test") {
-                        input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
-                      }
-            
-                      stage("Go Live") {
-                        sh "oc set -n ${project} route-backends ${appName} ${appName}-${tag}=100 ${appName}-${altTag}=0 --loglevel=4"
-                      }
-
-                    }
+                  stage("Build") {
+                    echo "building tag ${tag}"
+                    openshiftBuild buildConfig: appName, showBuildLogs: "true", verbose: verbose
+                  }
+        
+                  stage("Deploy Test") {
+                    openshiftTag srcStream: appName, srcTag: 'latest', destinationStream: appName, destinationTag: tag, verbose: verbose
+                    openshiftVerifyDeployment deploymentConfig: "${appName}-${tag}", verbose: verbose
+                  }
+        
+                  stage("Test") {
+                    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
+                  }
+        
+                  stage("Go Live") {
+                    sh "oc set -n ${project} route-backends ${appName} ${appName}-${tag}=100 ${appName}-${altTag}=0 --loglevel=4"
                   }
                 }
              }
@@ -150,7 +140,7 @@ objects:
           value: ${NPM_MIRROR}
         from:
           kind: ImageStreamTag
-          name: nodejs:8
+          name: nodejs:4
           namespace: ${NAMESPACE}
       type: Source
     triggers:
@@ -367,6 +357,13 @@ objects:
           resources:
             limits:
               memory: ${MEMORY_MONGODB_LIMIT}
+          volumeMounts:
+          - mountPath: /var/lib/mongodb/data
+            name: ${DATABASE_SERVICE_NAME}-data
+        volumes:
+        - emptyDir:
+            medium: ""
+          name: ${DATABASE_SERVICE_NAME}-data
     triggers:
     - imageChangeParams:
         automatic: true
