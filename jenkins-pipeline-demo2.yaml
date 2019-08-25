@@ -16,9 +16,9 @@ spec:
       jenkinsfile: |
         // Set project names
         def USERID     = "user9"
-        def devProj    = "pipeline-dev-$GUID"
-        def testProj   = "pipeline-test-$GUID"
-        def prodProj   = "pipeline-prod-$GUID"
+        def devProj    = "pipeline-dev-$USERID"
+        def testProj   = "pipeline-test-$USERID"
+        def prodProj   = "pipeline-prod-$USERID"
         def svc_name   = "myapp"
         pipeline {
           agent any
@@ -72,7 +72,7 @@ spec:
             }
             stage ('Deploy and Test in Testing Env') {
               steps{
-                echo "*** Deploy testready build in pipeline-${GUID}-test project  ***"
+                echo "*** Deploy testready build in ${testProj} project  ***"
                 script {
                   openshift.withCluster() {
                     openshift.withProject("${testProj}") {
@@ -84,7 +84,7 @@ spec:
                         sleep 1
                       }
                       // curl the testProject route to get cats
-                      // sh 'curl http://myapp-pipeline-${GUID}-test.apps.shared-ocp4.dev4.openshift.opentlc.com/ | grep cats -q'
+                      // sh 'curl http://myapp-pipeline-${USERID}-test.apps.shared-ocp4.dev4.openshift.opentlc.com/ | grep cats -q'
                       def route = openshift.selector("route", "myapp").object()
                       def the_route = "${route.spec.host}"
                       echo "route: ${the_route}"
