@@ -1,0 +1,49 @@
+kind: "BuildConfig"
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "jenkins-pipeline-demo"
+spec:
+  triggers:
+  - github:
+      secret: 5Mlic4Le
+    type: GitHub
+  - generic:
+      secret: FiArdDBH
+    type: Generic
+  strategy:
+    type: "JenkinsPipeline"
+    jenkinsPipelineStrategy:
+      jenkinsfile: |
+                    def USERID  = "USERID"
+                    def devProj = "pipeline-dev-$USERID"
+                    pipeline {
+                      agent any
+                      stages{
+                        stage("Build") {
+                          steps{
+                            script{
+                              openshift.withCluster() {
+                                openshift.withProject("${devProj}") {
+                                  echo '*** Build Starting ***'
+                                  openshift.selector('bc', 'myapp').startBuild("--wait").logs('-f')
+                                  echo '*** Build Complete ***'
+                                }
+                              }
+                            }
+                          }
+                        }
+                        stage("Deploy and Verify in Development Env"){
+                          steps{
+                            script{
+                              openshift.withCluster() {
+                                openshift.withProject("${devProj}") {
+                                  echo '*** Deployment Starting ***'
+                                  openshift.selector('dc', 'myapp').rollout().latest()
+                                  echo '*** Deployment Complete ***'
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
