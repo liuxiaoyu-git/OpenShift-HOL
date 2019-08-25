@@ -42,7 +42,7 @@ spec:
                 script{
                   openshift.withCluster() {
                     openshift.withProject("${devProj}") {
-                      // Deploy the cotd application in the devProject
+                      // Deploy the myapp application in the devProject
                       openshift.selector('dc', 'myapp').rollout().latest();
                       // Wait for application to be deployed
                       def dc = openshift.selector("dc", "myapp").object()
@@ -63,6 +63,7 @@ spec:
                       } else {
                         echo "Unable to connect to ${svc_name}"
                       }
+                      
                       openshift.tag("${devProj}/myapp:latest", "${devProj}/myapp:testready")
                     }
                   }
@@ -72,11 +73,11 @@ spec:
             }
             stage ('Deploy and Test in Testing Env') {
               steps{
-                echo "*** Deploy testready build in ${testProj} project  ***"
+                echo "*** Deploy testready build in pipeline-test-${USERID} project  ***"
                 script {
                   openshift.withCluster() {
                     openshift.withProject("${testProj}") {
-                      // Deploy the cotd application in the testProject
+                      // Deploy the myapp application in the testProject
                       openshift.selector('dc', 'myapp').rollout().latest();
                       // Wait for application to be deployed
                       def dc = openshift.selector("dc", "myapp").object()
@@ -84,11 +85,10 @@ spec:
                         sleep 1
                       }
                       // curl the testProject route to get cats
-                      // sh 'curl http://myapp-pipeline-${USERID}-test.apps.shared-ocp4.dev4.openshift.opentlc.com/ | grep cats -q'
-                      def route = openshift.selector("route", "myapp").object()
-                      def the_route = "${route.spec.host}"
-                      echo "route: ${the_route}"
-                      sh "curl -s http://${the_route}/item.php | grep -q cats"
+                      //def route = openshift.selector("route", "myapp").object()
+                      //def the_route = "${route.spec.host}"
+                      //echo "route: ${the_route}"
+                      //sh "curl -s http://${the_route}/item.php"
                     }
                   }
                 }
@@ -107,12 +107,12 @@ spec:
                       while (dc.spec.replicas != dc.status.availableReplicas) {
                         sleep 1
                       }
-                      sleep 10
+                      //sleep 10
                       // test route
-                      def route = openshift.selector("route", "myapp").object()
-                      def the_route = "${route.spec.host}"
-                      echo "route: ${the_route}"
-                      sh "curl -s http://${the_route}/item.php | grep -q cats"
+                      //def route = openshift.selector("route", "myapp").object()
+                      //def the_route = "${route.spec.host}"
+                      //echo "route: ${the_route}"
+                      //sh "curl -s http://${the_route}/item.php | grep -q cats"
                     }
                   }
                 }
