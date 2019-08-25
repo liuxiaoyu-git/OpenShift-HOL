@@ -14,7 +14,7 @@ spec:
     type: "JenkinsPipeline"
     jenkinsPipelineStrategy:
       jenkinsfile: |
-                    def USERID  = "USERID"
+                    def USERID  = "user9"
                     def devProj = "pipeline-dev-$USERID"
                     pipeline {
                       agent any
