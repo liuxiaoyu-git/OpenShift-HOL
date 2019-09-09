@@ -6,9 +6,9 @@ metadata:
   creationTimestamp: null
   labels:
     app: jenkins-pipeline-development
-    name: tomcat-s2i-jenkins-pipeline
+    name: tomcat-s2i-jenkins-pipeline-ocp4
     template: application-template-development-pipeline
-  name: tomcat-s2i-jenkins-pipeline
+  name: tomcat-s2i-jenkins-pipeline-ocp4
 spec:
   output: {}
   postCommit: {}
