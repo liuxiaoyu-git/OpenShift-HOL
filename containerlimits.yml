@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: container-limits 
+spec:
+  limits:
+    - type: Container
+      max:
+        cpu: 20m		#最大CPU
+        memory: 64Mi 
+      defaultRequest:
+        cpu: 10m		#缺省CPU
+        memory: 32Mi
