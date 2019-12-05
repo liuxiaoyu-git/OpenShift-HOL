@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Template
 labels:
   template: CICD Pipeline Demo
-  group: CICD-Pipeline-Demo
+  group: CICDPipelineDemo
 metadata:
   annotations:
     iconClass: icon-jenkins
     tags: instant-app,jenkins,gogs,nexus,cicd
-  name: CICD-Pipeline-Demo
+  name: CICDPipelineDemo
 message: "Use the following credentials for login:\nJenkins: use your OpenShift credentials\nNexus: admin/admin123\nSonarQube: admin/admin\nGogs Git Server: gogs/gogs"
 parameters:
 - displayName: DEV project name
