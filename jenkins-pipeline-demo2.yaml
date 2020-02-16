@@ -16,9 +16,9 @@ spec:
       jenkinsfile: |
         // Set project names
         def USERID     = "user9"
-        def devProj    = "pipeline-dev-$USERID"
-        def testProj   = "pipeline-test-$USERID"
-        def prodProj   = "pipeline-prod-$USERID"
+        def devProj    = "$USERID-pipeline-dev"
+        def testProj   = "$USERID-pipeline-test"
+        def prodProj   = "$USERID-pipeline-prod"
         def svc_name   = "myapp"
         pipeline {
           agent any
