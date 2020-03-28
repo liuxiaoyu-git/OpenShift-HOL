@@ -6,7 +6,7 @@
             "openshift.io/description": "Project is created from RESP API",
             "openshift.io/display-name": "My Project1"
         },
-        "name": "myproject1"
+        "name": "my-project"
     },
     "spec": {
         "finalizers": [
